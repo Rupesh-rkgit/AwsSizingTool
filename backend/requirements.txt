@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+boto3
+pydantic
+pydantic-settings
+aiosqlite
+python-multipart
+jinja2
+pyyaml
+python-dotenv
+python-magic
+pytest
+hypothesis

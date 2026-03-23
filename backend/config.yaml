@@ -1,0 +1,46 @@
+# AWS Bedrock Configuration
+bedrock:
+  region: "us-east-1"
+  model_id: "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+  max_tokens: 64000
+  temperature: 0.2
+  timeout_seconds: 180
+  retry_attempts: 2
+  retry_backoff_base: 1.0
+
+# AWS Credentials (optional — defaults to boto3 credential chain)
+aws:
+  profile_name: null
+  access_key_id: null
+  secret_access_key: null
+  session_token: null
+
+# Application Settings
+app:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins: ["http://localhost:5173"]
+  max_upload_size_mb: 20
+  supported_image_formats: ["png", "jpg", "jpeg", "webp"]
+  default_pricing_region: "us-east-1"
+  enable_enrichment: true
+  enrichment_timeout_seconds: 15
+  enrichment_max_pricing_results: 10
+
+# Database
+database:
+  path: "data/sizing_tool.db"
+  echo_sql: false
+
+# Report Generation
+report:
+  html_template: "templates/report.html"
+  branding:
+    company_name: "AWS Infrastructure Sizing Tool"
+    accent_color: "#A100FF"
+  max_history: 50
+
+# Logging
+logging:
+  level: "INFO"
+  format: "json"

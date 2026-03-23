@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ sizing.title }}</title>
+<style>
+  :root {
+    --acn-purple: #A100FF;
+    --acn-purple-dark: #7B00C4;
+    --acn-purple-light: #D966FF;
+    --acn-black: #000000;
+    --acn-white: #FFFFFF;
+    --acn-gray-dark: #333333;
+    --acn-gray-mid: #666666;
+    --acn-gray-light: #F2F2F2;
+    --bg: #F4F0F7;
+    --card-bg: #ffffff;
+    --border: #E0D6E8;
+    --text: #1a1a1a;
+    --text-light: #555555;
+    --code-bg: #1e1e2e;
+    --section-infra: #0070AD;
+    --section-infra-bg: #EFF8FF;
+    --section-infra-border: #66B2D6;
+    --section-bom: #008752;
+    --section-bom-bg: #EDFFF6;
+    --section-bom-border: #66C49E;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Trebuchet MS', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  .top-bar {
+    background: linear-gradient(135deg, var(--acn-black) 0%, #1a0033 60%, var(--acn-purple-dark) 100%);
+    color: #fff;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 12px rgba(161,0,255,0.2);
+  }
+  .top-bar h1 { font-size: 20px; font-weight: 600; }
+  .top-bar .aws-badge {
+    background: var(--acn-purple);
+    color: #fff;
+    padding: 3px 12px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+</style>
+<style>
+  .toc-sidebar {
+    position: fixed;
+    left: 0;
+    top: 56px;
+    width: 270px;
+    height: calc(100vh - 56px);
+    background: var(--acn-white);
+    border-right: 2px solid var(--border);
+    overflow-y: auto;
+    padding: 16px 0;
+    z-index: 50;
+  }
+  .toc-sidebar h3 {
+    padding: 10px 16px 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+  .toc-sidebar h3.toc-infra { color: var(--section-infra); }
+  .toc-sidebar h3.toc-bom { color: var(--section-bom); }
+  .toc-sidebar a {
+    display: block;
+    padding: 6px 16px 6px 20px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  .toc-sidebar a:hover {
+    background: var(--acn-gray-light);
+    border-left-color: var(--acn-purple);
+    color: var(--acn-purple-dark);
+  }
+  .toc-sidebar .divider {
+    height: 2px;
+    background: var(--border);
+    margin: 10px 16px;
+  }
+  .main-content {
+    margin-left: 270px;
+    padding: 32px 40px;
+    max-width: 1020px;
+  }
+  .doc-section {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 32px;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .section-infra {
+    border-left: 5px solid var(--section-infra);
+    background: var(--section-infra-bg);
+  }
+  .section-infra h2 { color: var(--section-infra); }
+  .section-infra th { background: var(--section-infra); }
+  .section-bom {
+    border-left: 5px solid var(--section-bom);
+    background: var(--section-bom-bg);
+  }
+  .section-bom h2 { color: var(--section-bom); }
+  .section-bom th { background: var(--section-bom); }
+  h1.doc-title {
+    font-size: 26px;
+    border-bottom: 3px solid var(--acn-purple);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin: 28px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 16px; margin: 20px 0 12px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 13px;
+  }
+  th {
+    background: var(--acn-purple);
+    color: #fff;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  tr:nth-child(even) td { background: #f9fafb; }
+  tr:hover td { background: #f0f4ff; }
+  pre {
+    background: var(--code-bg);
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 12px 0;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  code { font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; }
+  .summary-cards {
+    display: flex;
+    gap: 16px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .summary-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 24px;
+    min-width: 180px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .summary-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-light);
+    font-weight: 600;
+  }
+  .summary-card .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--section-bom);
+    margin-top: 4px;
+  }
+  .note {
+    background: #F9F0FF;
+    border-left: 4px solid var(--acn-purple);
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <span class="aws-badge">AWS</span>
+  <h1>{{ sizing.title }}</h1>
+</div>
+
+<!-- TOC Sidebar -->
+<nav class="toc-sidebar">
+  <h3 class="toc-infra">Infrastructure Sizing</h3>
+  <a href="#nfr-summary">NFR Summary</a>
+  <a href="#service-configs">Service Configurations</a>
+  <a href="#node-groups">Node Groups</a>
+  <a href="#pod-specs">Pod Specifications</a>
+  <a href="#hpa-configs">HPA Configurations</a>
+  <a href="#latency-budget">Latency Budget</a>
+  <a href="#kubernetes-manifests">Kubernetes Manifests</a>
+  <a href="#batch-jobs">Batch Jobs</a>
+  <a href="#cost-optimization">Cost Optimization</a>
+  <a href="#container-best-practices">Container Best Practices</a>
+  <a href="#network-config">Network Configuration</a>
+  <a href="#monitoring-metrics">Monitoring Metrics</a>
+  <div class="divider"></div>
+  <h3 class="toc-bom">Bill of Materials</h3>
+  <a href="#bom-tiers">BOM Tiers</a>
+  <a href="#cost-summary">Cost Summary</a>
+  <a href="#savings-plans">Savings Plans</a>
+  <a href="#service-summary">Service Summary</a>
+  <a href="#notes">Notes</a>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+
+  <!-- ===== SIZING SECTIONS ===== -->
+  <div class="doc-section section-infra">
+    <h1 class="doc-title">{{ sizing.title }}</h1>
+    <p><strong>Generated:</strong> {{ sizing.generated_at.isoformat() }} &nbsp; <strong>Region:</strong> {{ sizing.region }}</p>
+
+    <!-- NFR Summary -->
+    <section id="nfr-summary">
+      <h2>Non-Functional Requirements Summary</h2>
+      {% if sizing.nfr_summary %}
+      <table>
+        <thead><tr><th>Requirement</th><th>Target</th></tr></thead>
+        <tbody>
+        {% for item in sizing.nfr_summary %}
+          <tr><td>{{ item.requirement }}</td><td>{{ item.target }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No NFR summary items.</p>
+      {% endif %}
+    </section>
+
+    <!-- Service Configs -->
+    <section id="service-configs">
+      <h2>Service Configurations</h2>
+      {% for svc in sizing.service_configs %}
+      <h3>{{ svc.service_name }}</h3>
+      <table>
+        <thead><tr><th>Parameter</th><th>Recommendation</th><th>Rationale</th></tr></thead>
+        <tbody>
+        {% for p in svc.parameters %}
+          <tr><td>{{ p.parameter }}</td><td>{{ p.recommendation }}</td><td>{{ p.rationale or '' }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endfor %}
+    </section>
+
+    <!-- Node Groups -->
+    <section id="node-groups">
+      <h2>Node Groups</h2>
+      {% if sizing.node_groups %}
+      <table>
+        <thead><tr><th>Name</th><th>Instance Type</th><th>vCPU</th><th>Memory (GiB)</th><th>Min</th><th>Max</th><th>Desired</th><th>Capacity</th></tr></thead>
+        <tbody>
+        {% for ng in sizing.node_groups %}
+          <tr><td>{{ ng.name }}</td><td>{{ ng.instance_type }}</td><td>{{ ng.vcpu }}</td><td>{{ ng.memory_gib }}</td><td>{{ ng.min_nodes }}</td><td>{{ ng.max_nodes }}</td><td>{{ ng.desired_nodes }}</td><td>{{ ng.capacity_type }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Pod Specs -->
+    <section id="pod-specs">
+      <h2>Pod Specifications</h2>
+      {% if sizing.pod_specs %}
+      <table>
+        <thead><tr><th>Workload</th><th>CPU Req</th><th>CPU Limit</th><th>Mem Req</th><th>Mem Limit</th><th>Min Pods</th><th>Max Pods</th><th>Scaling</th></tr></thead>
+        <tbody>
+        {% for ps in sizing.pod_specs %}
+          <tr><td>{{ ps.workload }}</td><td>{{ ps.cpu_request }}</td><td>{{ ps.cpu_limit }}</td><td>{{ ps.memory_request }}</td><td>{{ ps.memory_limit }}</td><td>{{ ps.min_pods }}</td><td>{{ ps.max_pods }}</td><td>{{ ps.scaling_method }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- HPA Configs -->
+    <section id="hpa-configs">
+      <h2>HPA Configurations</h2>
+      {% if sizing.hpa_configs %}
+      <table>
+        <thead><tr><th>Target Deployment</th><th>Min Replicas</th><th>Max Replicas</th><th>CPU Target %</th><th>Scale Up (s)</th><th>Scale Down (s)</th></tr></thead>
+        <tbody>
+        {% for hpa in sizing.hpa_configs %}
+          <tr><td>{{ hpa.target_deployment }}</td><td>{{ hpa.min_replicas }}</td><td>{{ hpa.max_replicas }}</td><td>{{ hpa.cpu_target_percent }}</td><td>{{ hpa.scale_up_window_seconds }}</td><td>{{ hpa.scale_down_window_seconds }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Latency Budget -->
+    <section id="latency-budget">
+      <h2>Latency Budget</h2>
+      {% if sizing.latency_budget %}
+      <table>
+        <thead><tr><th>Component</th><th>Expected Latency</th><th>Notes</th></tr></thead>
+        <tbody>
+        {% for lb in sizing.latency_budget %}
+          <tr><td>{{ lb.component }}</td><td>{{ lb.expected_latency }}</td><td>{{ lb.notes }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Kubernetes Manifests -->
+    <section id="kubernetes-manifests">
+      <h2>Kubernetes Manifests</h2>
+      {% for manifest in sizing.kubernetes_manifests %}
+      <h3>{{ manifest.kind }}: {{ manifest.name }}</h3>
+      <pre><code>{{ manifest.yaml_content }}</code></pre>
+      {% endfor %}
+    </section>
+
+    <!-- Batch Jobs -->
+    <section id="batch-jobs">
+      <h2>Batch Jobs</h2>
+      {% if sizing.batch_jobs %}
+      <table>
+        <thead><tr><th>Frequency</th><th>Record Volume</th><th>Window</th><th>Throughput</th><th>Parallelism</th><th>CPU Req</th><th>CPU Limit</th><th>Mem Req</th><th>Mem Limit</th></tr></thead>
+        <tbody>
+        {% for bj in sizing.batch_jobs %}
+          <tr><td>{{ bj.frequency }}</td><td>{{ bj.record_volume }}</td><td>{{ bj.processing_window }}</td><td>{{ bj.throughput_required }}</td><td>{{ bj.parallelism }}</td><td>{{ bj.pod_cpu_request }}</td><td>{{ bj.pod_cpu_limit }}</td><td>{{ bj.pod_memory_request }}</td><td>{{ bj.pod_memory_limit }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Cost Optimization -->
+    <section id="cost-optimization">
+      <h2>Cost Optimization Strategies</h2>
+      {% if sizing.cost_optimization %}
+      <table>
+        <thead><tr><th>Strategy</th><th>Savings Potential</th><th>Applicable To</th></tr></thead>
+        <tbody>
+        {% for co in sizing.cost_optimization %}
+          <tr><td>{{ co.strategy }}</td><td>{{ co.savings_potential }}</td><td>{{ co.applicable_to }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Container Best Practices -->
+    <section id="container-best-practices">
+      <h2>Container Best Practices</h2>
+      {% if sizing.container_best_practices %}
+      <table>
+        <thead><tr><th>Parameter</th><th>Recommendation</th><th>Rationale</th></tr></thead>
+        <tbody>
+        {% for bp in sizing.container_best_practices %}
+          <tr><td>{{ bp.parameter }}</td><td>{{ bp.recommendation }}</td><td>{{ bp.rationale or '' }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Network Config -->
+    <section id="network-config">
+      <h2>Network Configuration</h2>
+      {% if sizing.network_config %}
+      <table>
+        <thead><tr><th>Parameter</th><th>Recommendation</th><th>Rationale</th></tr></thead>
+        <tbody>
+        {% for nc in sizing.network_config %}
+          <tr><td>{{ nc.parameter }}</td><td>{{ nc.recommendation }}</td><td>{{ nc.rationale or '' }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Monitoring Metrics -->
+    <section id="monitoring-metrics">
+      <h2>Monitoring Metrics</h2>
+      {% if sizing.monitoring_metrics %}
+      <table>
+        <thead><tr><th>Metric</th><th>Target</th><th>Action if Exceeded</th></tr></thead>
+        <tbody>
+        {% for mm in sizing.monitoring_metrics %}
+          <tr><td>{{ mm.metric }}</td><td>{{ mm.target }}</td><td>{{ mm.action_if_exceeded }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+  </div><!-- end section-infra -->
+
+  <!-- ===== BOM SECTIONS ===== -->
+  <div class="doc-section section-bom">
+    <h1 class="doc-title">{{ bom.title }}</h1>
+    <p><strong>Generated:</strong> {{ bom.generated_at.isoformat() }} &nbsp; <strong>Region:</strong> {{ bom.region }} &nbsp; <strong>Pricing:</strong> {{ bom.pricing_type }}</p>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="label">Total Monthly Cost</div>
+        <div class="value">${{ "%.2f"|format(bom.total_monthly) }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Total Annual Cost</div>
+        <div class="value">${{ "%.2f"|format(bom.total_annual) }}</div>
+      </div>
+    </div>
+
+    <!-- BOM Tiers -->
+    <section id="bom-tiers">
+      <h2>BOM Tiers</h2>
+      {% for tier in bom.tiers %}
+      <h3>{{ tier.tier_name }}</h3>
+      {% for section in tier.sections %}
+      <h4>{{ section.section_name }}</h4>
+      <table>
+        <thead><tr><th>Line Item</th><th>Specification</th><th>Quantity</th><th>Unit Price</th><th>Monthly Estimate</th></tr></thead>
+        <tbody>
+        {% for item in section.line_items %}
+          <tr><td>{{ item.line_item }}</td><td>{{ item.specification }}</td><td>{{ item.quantity }}</td><td>{{ item.unit_price }}</td><td>${{ "%.2f"|format(item.monthly_estimate) }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <p><strong>Section Subtotal:</strong> ${{ "%.2f"|format(section.subtotal) }}</p>
+      {% endfor %}
+      <p><strong>Tier Subtotal:</strong> ${{ "%.2f"|format(tier.subtotal) }}</p>
+      {% endfor %}
+    </section>
+
+    <!-- Cost Summary -->
+    <section id="cost-summary">
+      <h2>Cost Summary</h2>
+      {% if bom.cost_summary %}
+      <table>
+        <thead><tr><th>Category</th><th>Monthly Estimate</th></tr></thead>
+        <tbody>
+        {% for item in bom.cost_summary %}
+          <tr><td>{{ item.category }}</td><td>${{ "%.2f"|format(item.monthly_estimate) }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Savings Plans -->
+    <section id="savings-plans">
+      <h2>Savings Plans</h2>
+      {% if bom.savings_plans %}
+      <table>
+        <thead><tr><th>Scenario</th><th>Monthly Estimate</th><th>Annual Estimate</th><th>Savings vs On-Demand</th></tr></thead>
+        <tbody>
+        {% for sp in bom.savings_plans %}
+          <tr><td>{{ sp.scenario }}</td><td>{{ sp.monthly_estimate }}</td><td>{{ sp.annual_estimate }}</td><td>{{ sp.savings_vs_on_demand }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Service Summary -->
+    <section id="service-summary">
+      <h2>Service Summary</h2>
+      {% if bom.service_summary %}
+      <table>
+        <thead><tr><th>#</th><th>Service</th><th>Purpose</th><th>Specification</th></tr></thead>
+        <tbody>
+        {% for svc in bom.service_summary %}
+          <tr><td>{{ svc.number }}</td><td>{{ svc.service }}</td><td>{{ svc.purpose }}</td><td>{{ svc.specification }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <!-- Notes -->
+    <section id="notes">
+      <h2>Notes</h2>
+      {% if bom.notes %}
+      <ul>
+        {% for note in bom.notes %}
+        <li>{{ note }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+
+  </div><!-- end section-bom -->
+
+</div><!-- end main-content -->
+
+</body>
+</html>
